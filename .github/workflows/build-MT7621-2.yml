@@ -101,7 +101,7 @@ jobs:
           done
       - name: Upload packages
           uses: actions/upload-artifact@master
-          if: always()
+          #if: always()
           with:
             name: Padavan-packages
             path: /opt/images
