@@ -1,5 +1,5 @@
 #修改TNAME: TNAME 中的NEWIFI-MINI为你需要编译的型号，注意名称要与configs/templates/目录下的名字相同
-name: Build Padavan
+name: Build NEWIFI-MINI
 
 on:
   release:
