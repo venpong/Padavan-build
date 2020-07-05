@@ -41,8 +41,8 @@ jobs:
         TNAME: NEWIFI-MINI
       run: |
         cd /opt/rt-n56u/trunk
-        if [ ! -f configs/templates/$m.config ] ; then
-        echo "configs/templates/$m.config not found "
+        if [ ! -f configs/templates/$TNAME.config ] ; then
+        echo "configs/templates/$TNAME.config not found "
         exit 1
         fi
         cp -f configs/templates/$m.config .config
