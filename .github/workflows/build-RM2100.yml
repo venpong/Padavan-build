@@ -1,21 +1,23 @@
-name: Build RM2100 R2100
+#修改TNAME: TNAME 中的RM2100为你需要编译的型号，注意名称要与configs/templates/目录下的名字相同
+name: Build Padavan
 
 on:
   release:
     types: [published]
-  #  push:
-  #    tags:
-  #    - 'v*'
-  #  branches:
+  push:
+    tags:
+      - 'v*'
+  #  branches: 
   #    - master
-  #schedule:
-  #  - cron: 0 17 * * 4
+  #  schedule:
+  #    - cron: 0 8 * * 5
   watch:
     types: [started]
 
 jobs:
   build:
     runs-on: ubuntu-18.04
+    if: github.event.repository.owner.id == github.event.sender.id
 
     steps:
       - name: Checkout
@@ -36,13 +38,9 @@ jobs:
           mkdir -p /opt/images/
       - name: Build Firmware
         env:
-          TNAME: "RM2100 R2100"
+          TNAME: RM2100
         run: |
-          cwd=`pwd`
-          CONFIG_TOOLCHAIN_DIR=${cwd//\//\\\/}\\/toolchain-mipsel
           cd /opt/rt-n56u/trunk
-          for m in $TNAME;
-          do
           if [ ! -f configs/templates/$m.config ] ; then
           echo "configs/templates/$m.config not found "
           exit 1
@@ -92,16 +90,17 @@ jobs:
           echo "CONFIG_FIRMWARE_INCLUDE_ALIDDNS=y" >> .config #aliddns
           ##内网穿透服务##
           ####################################################################################
-          sed -i "s/^CONFIG_TOOLCHAIN_DIR=.*$/CONFIG_TOOLCHAIN_DIR=${CONFIG_TOOLCHAIN_DIR}/g" .config
-          sudo ./clear_tree_simple
-          sudo ./build_firmware_modify $m 0
+          #自定义添加其它功能请参考源码configs/templates/目录下的config文件。按照上面的格式添加即可
+          #格式如下：
+          #sed -i '/自定义项/d' .config
+          #echo "自定义项=y" >> .config
+          #########################################################################################
+          sudo ./clear_tree
+          sudo ./build_firmware_modify $TNAME 0
           sudo mv -f images/*.trx /opt/images/
-          done
-      - name: Upload binaries to release
-        uses: svenstaro/upload-release-action@v1-release
+      - name: Upload packages
+        uses: actions/upload-artifact@master
+        if: always()
         with:
-          repo_token: ${{ secrets.R_TOKEN }}
-          file: /opt/images/*.trx
-          tag: AtuoBuild
-          overwrite: true
-          file_glob: true
+          name: Padavan-packages
+          path: /opt/images
